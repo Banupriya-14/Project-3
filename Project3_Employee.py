@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import time
 
 import pickle
 from sklearn import preprocessing
@@ -22,20 +23,24 @@ with open('E:/MDTM40/Project3_Employee/scaler.pkl', 'rb') as scalerfile:
     scaler_model = pickle.load(scalerfile)
 
 st.sidebar.title('🌐 Employee Attrition Analysis and Prediction')
-selection = st.sidebar.radio('Go to',['Home','Predict Employee Attrition','Insights'])
+selection = st.sidebar.radio('Go to',['🏠 Home','🎯 Predict Employee Attrition','📌 Insights'])
 
-if selection == 'Home':
-    st.title('🪪 Employee Attrition Analysis and Prediction')
+if selection == '🏠 Home':
+    st.title('  🪪 Employee Attrition Analysis and Prediction')
+    st.set_page_config(page_title="Employee Attrition Dashboard", layout="wide")
     st.write("""Employee turnover poses a significant challenge for organizations, resulting in increased costs, reduced productivity, and team disruptions. Understanding the factors driving attrition and predicting at-risk employees is critical for effective retention strategies. This project aims to analyze employee data, identify key drivers of attrition, and build predictive models to support proactive decision-making in workforce management.
  """)
-    st.write("Explore the dataset 🗂️")
+    st.markdown("Explore the dataset 🗂️")
     if st.button('Click Here'):
+        with st.status("Fetching data") as status:
+            time.sleep(1)
+            status.update(label="Completed!", state="complete", expanded=False)
         df=pd.read_csv('E:\MDTM40\Project3_Employee\Employee-Attrition - Employee-Attrition.csv')
         st.dataframe(df)
 
-if selection == 'Predict Employee Attrition':
+if selection == '🎯 Predict Employee Attrition':
     st.header(" 🔍 Predict Employee Attrition")
-    col1, col2 = st.columns(2, gap='small')
+    col1, col2 = st.columns(2, gap='large')
     with col1:
         age=st.slider("Age", min_value= 18, max_value=60)
         btravel=st.selectbox("Business Travel",['Travel_Rarely','Travel_Frequently','Non-Travel'])
@@ -82,7 +87,7 @@ if selection == 'Predict Employee Attrition':
     
     left, middle, right = st.columns(3)
 
-    if data and middle.button("🔍 Predict", type="secondary"):
+    if data and middle.button("🔍 Predict Attrition", type="secondary"):
 
         input_data = np.array(data).reshape(1,-1)
 
@@ -90,11 +95,12 @@ if selection == 'Predict Employee Attrition':
         prediction = loaded_model.predict(scaler_model.transform(input_data))
 
         if prediction[0]==0:
+            st.balloons()
             st.success("💼 Great news! The employee is engaged and likely to remain with the organization.")
         else:
             st.warning("🚨Risk Alert: This employee may leave. Consider taking retention actions.")
 
-if selection == 'Insights':
+if selection == '📌 Insights':
 
     st.header('📈 Insights')
 
@@ -125,7 +131,7 @@ if selection == 'Insights':
 
         fig, ax = plt.subplots()
         sns.countplot(data=df, y="JobRole", hue="Attrition", ax=ax)
-        ax.set_title("Attrition Count by EducationField")
+        ax.set_title("Attrition Count by JobRole")
         st.pyplot(fig)
 
 
